@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="store_info">
+        <item>店家1</item>
+        <item>店家2</item>
+        <item>店家3</item>
+        <item>店家4</item>
+        <item>店家5</item>
+        <item>店家6</item>
+        <item>店家7</item>
+        <item>店家8</item>
+    </string-array>
+</resources>

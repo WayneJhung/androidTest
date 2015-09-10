@@ -1,6 +1,7 @@
 package com.jeweijhung.easyui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity; //支援舊的手機使用lib
 import android.os.Bundle;
@@ -8,9 +9,13 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
@@ -18,6 +23,9 @@ public class MainActivity extends AppCompatActivity {
     private EditText inputText;
     private static Toast toast;
     private CheckBox hide;
+    private ListView history;
+    private Spinner storeInfo;
+
     private SharedPreferences sp; //讀
     private SharedPreferences.Editor editor; //寫
 
@@ -25,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        sp = getSharedPreferences("memo", Context.MODE_PRIVATE);
+        sp = getSharedPreferences("defaultSetting", Context.MODE_PRIVATE);
         editor = sp.edit();
 
         inputText = (EditText) findViewById(R.id.editText);
@@ -53,6 +61,37 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         hide.setChecked(sp.getBoolean("hide", false));
+
+        history = (ListView) findViewById(R.id.history);
+        storeInfo = (Spinner) findViewById(R.id.spinner);
+
+        loadHistory();
+        loadStoreInfo();
+    }
+
+    private void loadStoreInfo() {
+//        String[] data = {"AAA店", "BBB店", "CCC店"};
+        String[] data = getResources().getStringArray(R.array.store_info);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, data);
+        storeInfo.setAdapter(adapter);
+    }
+
+    private void loadHistory() {
+        String result = Utils.readFile(this, "history.txt");
+        String[] data = result.split("\n");
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, data);
+
+        history.setAdapter(adapter); //轉接處理字元
+    }
+
+    public void goToMenu(View view) {
+        String storeInfoString = (String) storeInfo.getSelectedItem();
+
+        Intent intent = new Intent(); //前往指定activity
+        intent.setClass(this, DrinkMenuActivity.class);
+        intent.putExtra("store_info", storeInfoString);
+        startActivity(intent);
     }
 
     public void magic(View view) {
@@ -63,6 +102,8 @@ public class MainActivity extends AppCompatActivity {
             text = text.replace("a", "*");
         }
         makeTextAndShow(this, text, Toast.LENGTH_LONG);
+
+        Utils.writeFile(this, "history.txt", text + "\n");
     }
 
 
